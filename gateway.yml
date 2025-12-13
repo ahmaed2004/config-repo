@@ -1,0 +1,27 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: student-service
+          uri: lb://STUDENT-SERVICE
+          predicates:
+            - Path=/api/students/**
+        
+        - id: course-service
+          uri: lb://COURSE-SERVICE
+          predicates:
+            - Path=/api/courses/**, /api/exams/**
+        
+        - id: portal-api
+          uri: lb://PORTAL-API
+          predicates:
+            - Path=/api/portal/**
