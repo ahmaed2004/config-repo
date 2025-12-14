@@ -19,4 +19,4 @@ spring:
 
 # Configuration personnalisée obligatoire (requis par le sujet)
 mes-config-ms:
-  courses-last: 30
+  courses-last: 7
