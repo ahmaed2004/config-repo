@@ -1,15 +1,6 @@
-server:
-  port: 8080
-
 spring:
-  application:
-    name: gateway
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
-          lower-case-service-id: true
       routes:
         - id: student-service
           uri: lb://STUDENT-SERVICE
@@ -21,6 +12,7 @@ spring:
           predicates:
             - Path=/api/courses/**, /api/exams/**
         
+        # NOUVEAU : Route pour Portal API
         - id: portal-api
           uri: lb://PORTAL-API
           predicates:
