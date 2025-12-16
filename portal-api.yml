@@ -1,39 +1,57 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: portal-api
+  datasource:
+    url: jdbc:mysql://localhost:3306/portal_db?createDatabaseIfNotExist=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+# Configuration Feign
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: basic
+
+# Configuration Circuit Breaker détaillée
 resilience4j:
   circuitbreaker:
     configs:
       default:
-        # Taille de la fenêtre glissante
         slidingWindowSize: 10
-        # Nombre minimum d'appels avant calcul du taux d'échec
         minimumNumberOfCalls: 5
-        # Nombre d'appels autorisés en état HALF_OPEN
         permittedNumberOfCallsInHalfOpenState: 3
-        # Transition automatique OPEN → HALF_OPEN
         automaticTransitionFromOpenToHalfOpenEnabled: true
-        # Temps d'attente avant passage à HALF_OPEN
         waitDurationInOpenState: 10s
-        # Seuil d'échec pour ouvrir le circuit (%)
         failureRateThreshold: 50
-        # Enregistrer les événements pour monitoring
         registerHealthIndicator: true
         recordExceptions:
           - org.springframework.web.client.HttpServerErrorException
           - java.io.IOException
           - feign.FeignException
     instances:
-      # Circuit Breaker pour Student Service
       studentService:
         baseConfig: default
         waitDurationInOpenState: 5s
         failureRateThreshold: 50
-        
-      # Circuit Breaker pour Course Service
       courseService:
         baseConfig: default
         waitDurationInOpenState: 5s
         failureRateThreshold: 50
 
-  # Configuration Retry (nouvelle)
   retry:
     configs:
       default:
@@ -47,7 +65,6 @@ resilience4j:
       courseService:
         baseConfig: default
 
-  # Configuration Timeout
   timelimiter:
     configs:
       default:
@@ -58,7 +75,7 @@ resilience4j:
       courseService:
         baseConfig: default
 
-# Logging pour voir les événements
+# Logging
 logging:
   level:
     io.github.resilience4j: DEBUG
