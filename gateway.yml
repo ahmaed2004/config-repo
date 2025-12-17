@@ -1,19 +1,71 @@
+server:
+  port: 8080
+
 spring:
+  application:
+    name: gateway
   cloud:
     gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
       routes:
+        # Student Service
         - id: student-service
           uri: lb://STUDENT-SERVICE
           predicates:
             - Path=/api/students/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: studentServiceCB
+                fallbackUri: forward:/fallback/students
         
+        # Course Service
         - id: course-service
           uri: lb://COURSE-SERVICE
           predicates:
             - Path=/api/courses/**, /api/exams/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: courseServiceCB
+                fallbackUri: forward:/fallback/courses
         
-        # NOUVEAU : Route pour Portal API
-        - id: portal-api
+        # Portal API - Inscriptions
+        - id: portal-enrollments
           uri: lb://PORTAL-API
           predicates:
-            - Path=/api/portal/**
+            - Path=/api/portal/enrollments/**
+        
+        # Portal API - Dashboard et statistiques
+        - id: portal-dashboard
+          uri: lb://PORTAL-API
+          predicates:
+            - Path=/api/portal/dashboard, /api/portal/statistics/**
+        
+        # Portal API - Agrégation
+        - id: portal-aggregation
+          uri: lb://PORTAL-API
+          predicates:
+            - Path=/api/portal/students/**, /api/portal/courses/**
+        
+        # Portal API - Health
+        - id: portal-health
+          uri: lb://PORTAL-API
+          predicates:
+            - Path=/api/portal/health/**
+
+# Configuration Resilience4j pour Gateway
+resilience4j:
+  circuitbreaker:
+    instances:
+      studentServiceCB:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+      courseServiceCB:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
