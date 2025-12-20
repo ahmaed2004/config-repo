@@ -11,16 +11,29 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
+        # User Service - Auth (PUBLIC)
+        - id: user-auth
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - RemoveRequestHeader=Cookie
+        
+        # User Service - Protected
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - JwtAuthenticationFilter
+        
         # Student Service
         - id: student-service
           uri: lb://STUDENT-SERVICE
           predicates:
             - Path=/api/students/**
           filters:
-            - name: CircuitBreaker
-              args:
-                name: studentServiceCB
-                fallbackUri: forward:/fallback/students
+            - JwtAuthenticationFilter
         
         # Course Service
         - id: course-service
@@ -28,44 +41,55 @@ spring:
           predicates:
             - Path=/api/courses/**, /api/exams/**
           filters:
-            - name: CircuitBreaker
-              args:
-                name: courseServiceCB
-                fallbackUri: forward:/fallback/courses
+            - JwtAuthenticationFilter
         
         # Portal API - Inscriptions
         - id: portal-enrollments
           uri: lb://PORTAL-API
           predicates:
             - Path=/api/portal/enrollments/**
+          filters:
+            - JwtAuthenticationFilter
         
         # Portal API - Dashboard et statistiques
         - id: portal-dashboard
           uri: lb://PORTAL-API
           predicates:
             - Path=/api/portal/dashboard, /api/portal/statistics/**
+          filters:
+            - JwtAuthenticationFilter
         
         # Portal API - Agrégation
         - id: portal-aggregation
           uri: lb://PORTAL-API
           predicates:
             - Path=/api/portal/students/**, /api/portal/courses/**
+          filters:
+            - JwtAuthenticationFilter
         
-        # Portal API - Health
+        # Portal API - Health (PUBLIC)
         - id: portal-health
           uri: lb://PORTAL-API
           predicates:
             - Path=/api/portal/health/**
 
-# Configuration Resilience4j pour Gateway
-resilience4j:
-  circuitbreaker:
-    instances:
-      studentServiceCB:
-        slidingWindowSize: 10
-        failureRateThreshold: 50
-        waitDurationInOpenState: 10s
-      courseServiceCB:
-        slidingWindowSize: 10
-        failureRateThreshold: 50
-        waitDurationInOpenState: 10s
+# Configuration JWT (même secret que User Service)
+jwt:
+  secret: education-platform-secret-key-2024-very-secure-and-long-key-minimum-256-bits
+
+# CORS Configuration
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: false
