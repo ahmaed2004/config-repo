@@ -4,12 +4,14 @@ server:
 spring:
   application:
     name: gateway
+
   cloud:
     gateway:
       discovery:
         locator:
           enabled: true
           lower-case-service-id: true
+
       routes:
         # User Service - Auth (PUBLIC)
         - id: user-auth
@@ -18,7 +20,7 @@ spring:
             - Path=/api/auth/**
           filters:
             - RemoveRequestHeader=Cookie
-        
+
         # User Service - Protected
         - id: user-service
           uri: lb://USER-SERVICE
@@ -26,7 +28,7 @@ spring:
             - Path=/api/users/**
           filters:
             - JwtAuthenticationFilter
-        
+
         # Student Service
         - id: student-service
           uri: lb://STUDENT-SERVICE
@@ -34,7 +36,7 @@ spring:
             - Path=/api/students/**
           filters:
             - JwtAuthenticationFilter
-        
+
         # Course Service
         - id: course-service
           uri: lb://COURSE-SERVICE
@@ -42,7 +44,7 @@ spring:
             - Path=/api/courses/**, /api/exams/**
           filters:
             - JwtAuthenticationFilter
-        
+
         # Portal API - Inscriptions
         - id: portal-enrollments
           uri: lb://PORTAL-API
@@ -50,7 +52,7 @@ spring:
             - Path=/api/portal/enrollments/**
           filters:
             - JwtAuthenticationFilter
-        
+
         # Portal API - Dashboard et statistiques
         - id: portal-dashboard
           uri: lb://PORTAL-API
@@ -58,7 +60,7 @@ spring:
             - Path=/api/portal/dashboard, /api/portal/statistics/**
           filters:
             - JwtAuthenticationFilter
-        
+
         # Portal API - Agrégation
         - id: portal-aggregation
           uri: lb://PORTAL-API
@@ -66,21 +68,13 @@ spring:
             - Path=/api/portal/students/**, /api/portal/courses/**
           filters:
             - JwtAuthenticationFilter
-        
+
         # Portal API - Health (PUBLIC)
         - id: portal-health
           uri: lb://PORTAL-API
           predicates:
             - Path=/api/portal/health/**
 
-# Configuration JWT (même secret que User Service)
-jwt:
-  secret: education-platform-secret-key-2024-very-secure-and-long-key-minimum-256-bits
-
-# CORS Configuration
-spring:
-  cloud:
-    gateway:
       globalcors:
         corsConfigurations:
           '[/**]':
@@ -93,3 +87,7 @@ spring:
               - OPTIONS
             allowedHeaders: "*"
             allowCredentials: false
+
+# JWT Configuration
+jwt:
+  secret: education-platform-secret-key-2024-very-secure-and-long-key-minimum-256-bits
