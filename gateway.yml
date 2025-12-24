@@ -22,3 +22,5 @@ spring:
                 allowed-headers:
                   - "*"
                 allow-credentials: true
+jwt:
+  secret: education-platform-secret-key-2024-very-secure-and-long-key
