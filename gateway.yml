@@ -1,12 +1,80 @@
+server:
+  port: 8080
+
 spring:
+  application:
+    name: gateway
+
   cloud:
     gateway:
       server:
         webflux:
+
           discovery:
             locator:
               enabled: true
               lower-case-service-id: true
+
+          routes:
+            # ================= AUTH (PUBLIC) =================
+            - id: user-auth
+              uri: lb://USER-SERVICE
+              predicates:
+                - Path=/api/auth/**
+              filters:
+                - RemoveRequestHeader=Cookie
+
+            # ================= USER (PROTECTED) =================
+            - id: user-service
+              uri: lb://USER-SERVICE
+              predicates:
+                - Path=/api/users/**
+              filters:
+                - JwtAuthenticationFilter
+
+            # ================= STUDENT =================
+            - id: student-service
+              uri: lb://STUDENT-SERVICE
+              predicates:
+                - Path=/api/students/**
+              filters:
+                - JwtAuthenticationFilter
+
+            # ================= COURSE + EXAMS =================
+            - id: course-service
+              uri: lb://COURSE-SERVICE
+              predicates:
+                - Path=/api/courses/**,/api/exams/**
+              filters:
+                - JwtAuthenticationFilter
+
+            # ================= PORTAL =================
+            - id: portal-enrollments
+              uri: lb://PORTAL-API
+              predicates:
+                - Path=/api/portal/enrollments/**
+              filters:
+                - JwtAuthenticationFilter
+
+            - id: portal-dashboard
+              uri: lb://PORTAL-API
+              predicates:
+                - Path=/api/portal/dashboard,/api/portal/statistics/**
+              filters:
+                - JwtAuthenticationFilter
+
+            - id: portal-aggregation
+              uri: lb://PORTAL-API
+              predicates:
+                - Path=/api/portal/students/**,/api/portal/courses/**
+              filters:
+                - JwtAuthenticationFilter
+
+            # ================= PORTAL HEALTH (PUBLIC) =================
+            - id: portal-health
+              uri: lb://PORTAL-API
+              predicates:
+                - Path=/api/portal/health/**
 
           globalcors:
             cors-configurations:
@@ -22,5 +90,7 @@ spring:
                 allowed-headers:
                   - "*"
                 allow-credentials: true
+
+# ================= JWT =================
 jwt:
-  secret: education-platform-secret-key-2024-very-secure-and-long-key
+  secret: education-platform-secret-key-2024-very-secure-and-long-key-minimum-256-bits
