@@ -86,6 +86,8 @@ resilience4j:
         baseConfig: default
       courseService:
         baseConfig: default
+jwt:
+  secret: education-platform-secret-key-2024-very-secure-and-long-key-minimum-256-bits        
 
 # Logging pour voir les événements
 logging:
