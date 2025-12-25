@@ -30,7 +30,7 @@ spring:
               predicates:
                 - Path=/api/users/**
               filters:
-                - JwtAuthenticationFilter
+                - 
 
             # ================= STUDENT =================
             - id: student-service
@@ -38,7 +38,7 @@ spring:
               predicates:
                 - Path=/api/students/**
               filters:
-                - JwtAuthenticationFilter
+                - 
 
             # ================= COURSE + EXAMS =================
             - id: course-service
@@ -46,7 +46,7 @@ spring:
               predicates:
                 - Path=/api/courses/**,/api/exams/**
               filters:
-                - JwtAuthenticationFilter
+                - 
 
             # ================= PORTAL =================
             - id: portal-enrollments
@@ -54,21 +54,21 @@ spring:
               predicates:
                 - Path=/api/portal/enrollments/**
               filters:
-                - JwtAuthenticationFilter
+                
 
             - id: portal-dashboard
               uri: lb://PORTAL-API
               predicates:
                 - Path=/api/portal/dashboard,/api/portal/statistics/**
               filters:
-                - JwtAuthenticationFilter
+                
 
             - id: portal-aggregation
               uri: lb://PORTAL-API
               predicates:
                 - Path=/api/portal/students/**,/api/portal/courses/**
               filters:
-                - JwtAuthenticationFilter
+                
 
             # ================= PORTAL HEALTH (PUBLIC) =================
             - id: portal-health
