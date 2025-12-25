@@ -29,7 +29,7 @@ spring:
               uri: lb://USER-SERVICE
               predicates:
                 - Path=/api/users/**
-              filters:
+              
                 - 
 
             # ================= STUDENT =================
@@ -37,7 +37,7 @@ spring:
               uri: lb://STUDENT-SERVICE
               predicates:
                 - Path=/api/students/**
-              filters:
+              
                 - 
 
             # ================= COURSE + EXAMS =================
@@ -45,7 +45,7 @@ spring:
               uri: lb://COURSE-SERVICE
               predicates:
                 - Path=/api/courses/**,/api/exams/**
-              filters:
+            
                 - 
 
             # ================= PORTAL =================
@@ -53,22 +53,20 @@ spring:
               uri: lb://PORTAL-API
               predicates:
                 - Path=/api/portal/enrollments/**
-              filters:
+              
                 
 
             - id: portal-dashboard
               uri: lb://PORTAL-API
               predicates:
                 - Path=/api/portal/dashboard,/api/portal/statistics/**
-              filters:
-                
+              
 
             - id: portal-aggregation
               uri: lb://PORTAL-API
               predicates:
                 - Path=/api/portal/students/**,/api/portal/courses/**
-              filters:
-                
+           
 
             # ================= PORTAL HEALTH (PUBLIC) =================
             - id: portal-health
